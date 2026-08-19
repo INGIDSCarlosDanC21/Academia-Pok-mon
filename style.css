@@ -1,39 +1,97 @@
 :root {
-  --bg: #eef3e0;
-  --panel: #ffffff;
-  --panel-alt: #f4f8e8;
-  --border-dark: #2c3e1f;
-  --border-mid: #6b8f3a;
-  --accent-red: #d84343;
-  --accent-blue: #3f6fb0;
-  --accent-yellow: #f2c94c;
-  --text-dark: #24301a;
-  --text-muted: #5a6a4d;
-  --pending: #f2c94c;
-  --approved: #4caf6d;
-  --invalid: #d84343;
-  --radius: 10px;
-  --shadow: 3px 3px 0 var(--border-dark);
+  /* ---- Paleta: menú de juego Pokémon clásico ---- */
+  --screen-bg: #c7d6a8;          /* fondo tipo pantalla Game Boy */
+  --screen-bg-dark: #aebd8e;
+  --box-blue-top: #5a90d0;       /* caja de diálogo: gradiente azul */
+  --box-blue-bottom: #1c3f72;
+  --border-outer: #101010;       /* borde negro exterior */
+  --border-inner: #f8f8f8;       /* borde blanco interior */
+  --text-onbox: #f8f8f8;
+  --text-dark: #1c2414;
+  --text-muted: #4a5a3a;
+  --accent-yellow: #ffce00;      /* selección / cursor */
+  --hp-green: #78c850;
+  --hp-red: #e8402a;
+  --panel: #fefef4;
+  --panel-alt: #eef2de;
+  --radius: 0px;                 /* estética de pixel: sin esquinas redondeadas */
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
-  background: var(--bg);
+  font-family: "VT323", monospace;
+  font-size: 20px;
+  background-color: var(--screen-bg);
   background-image:
-    radial-gradient(circle at 2px 2px, rgba(44,62,31,0.05) 1px, transparent 0);
-  background-size: 22px 22px;
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.035) 0px, rgba(0,0,0,0.035) 1px, transparent 1px, transparent 3px);
   color: var(--text-dark);
+  line-height: 1.35;
+  transition: background-color 1.4s ease-in-out;
+  position: relative;
+  overflow-x: hidden;
 }
 
-button, input, select, textarea { font-family: inherit; }
+/* ---------------- POKÉBOLA DE FONDO ----------------
+   Decoración fija hecha 100% con gradientes CSS (sin assets con
+   copyright), gira muy lentamente detrás del contenido. */
+.pokeball-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 900px;
+  height: 900px;
+  margin: -450px 0 0 -450px;
+  border-radius: 50%;
+  background:
+    linear-gradient(to bottom,
+      #e8402a 0%, #e8402a 46%,
+      #101010 46%, #101010 54%,
+      #f8f8f8 54%, #f8f8f8 100%);
+  opacity: 0.09;
+  z-index: 0;
+  pointer-events: none;
+  animation: pokeball-spin 120s linear infinite;
+}
+.pokeball-bg::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 170px;
+  height: 170px;
+  margin: -85px 0 0 -85px;
+  border-radius: 50%;
+  background: #f8f8f8;
+  border: 14px solid #101010;
+  box-sizing: border-box;
+}
+@keyframes pokeball-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pokeball-bg { animation: none; }
+}
+@media (max-width: 640px) {
+  .pokeball-bg { width: 560px; height: 560px; margin: -280px 0 0 -280px; }
+  .pokeball-bg::after { width: 110px; height: 110px; margin: -55px 0 0 -55px; border-width: 10px; }
+}
 
-/* ---------------- TOPBAR ---------------- */
+.topbar, #app { position: relative; z-index: 1; }
+
+button, input, select, textarea { font-family: "VT323", monospace; font-size: 1rem; }
+
+.pixel-heading {
+  font-family: "Press Start 2P", monospace;
+}
+
+/* ---------------- TOPBAR (HUD) ---------------- */
 .topbar {
-  background: var(--border-dark);
-  border-bottom: 4px solid var(--accent-yellow);
+  background: var(--border-outer);
+  border-bottom: 4px solid var(--border-inner);
+  box-shadow: 0 4px 0 var(--border-outer);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -41,7 +99,7 @@ button, input, select, textarea { font-family: inherit; }
 .topbar-inner {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,11 +110,12 @@ button, input, select, textarea { font-family: inherit; }
   background: none;
   border: none;
   color: var(--accent-yellow);
-  font-weight: 900;
-  font-size: 1.1rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
   letter-spacing: 1px;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 6px 0;
+  text-shadow: 2px 2px 0 var(--border-outer);
 }
 .topnav {
   display: flex;
@@ -65,250 +124,303 @@ button, input, select, textarea { font-family: inherit; }
   flex-wrap: wrap;
 }
 .nav-link {
-  background: none;
+  background: var(--border-outer);
   border: 2px solid var(--accent-yellow);
   color: var(--accent-yellow);
-  border-radius: 6px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   cursor: pointer;
-  font-weight: 700;
+  font-family: "VT323", monospace;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
 }
+.nav-link:hover, .nav-link:focus-visible { background: var(--accent-yellow); color: var(--border-outer); }
 .nav-user-area {
-  color: #fff;
-  font-size: 0.85rem;
+  color: var(--border-inner);
+  font-size: 0.95rem;
 }
 
 /* ---------------- LAYOUT ---------------- */
 #app {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px 16px 60px;
 }
 .view { width: 100%; }
 .hidden { display: none !important; }
 
 .global-message {
-  background: var(--accent-yellow);
-  border: 3px solid var(--border-dark);
-  border-radius: var(--radius);
+  background: var(--panel);
+  border: 3px solid var(--border-outer);
+  box-shadow: inset 0 0 0 2px var(--border-inner), 4px 4px 0 var(--border-outer);
   padding: 10px 14px;
-  margin-bottom: 14px;
-  font-weight: 700;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
 }
-.global-message.error { background: #f7b5b5; }
-.global-message.success { background: #b9e7bf; }
+.global-message.error { background: #f9d3cf; border-color: var(--hp-red); }
+.global-message.success { background: #d8f0cd; border-color: var(--hp-green); }
+
+/* ---------------- CAJA DE DIÁLOGO (elemento firma) ----------------
+   Doble borde negro/blanco + relleno azul degradado, como los menús
+   de FireRed. Todo el contenido "hablado" por la interfaz vive aquí. */
+.dialog-box {
+  background: linear-gradient(180deg, var(--box-blue-top), var(--box-blue-bottom));
+  border: 4px solid var(--border-outer);
+  box-shadow: inset 0 0 0 3px var(--border-inner), 6px 6px 0 var(--border-outer);
+  color: var(--text-onbox);
+  padding: 22px;
+}
 
 /* ---------------- HERO / INICIO ---------------- */
 .hero {
   text-align: center;
-  padding: 60px 16px;
-  background: var(--panel);
-  border: 4px solid var(--border-dark);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  padding: 54px 20px;
   margin-top: 24px;
 }
 .hero-title {
-  font-size: 3rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 2.4rem;
   margin: 0;
-  color: var(--accent-red);
-  text-shadow: 3px 3px 0 var(--border-dark);
+  color: var(--accent-yellow);
+  text-shadow: 4px 4px 0 var(--border-outer);
   letter-spacing: 2px;
 }
 .hero-sub {
-  margin: 4px 0 18px;
-  color: var(--accent-blue);
-  letter-spacing: 4px;
-  font-size: 1.4rem;
+  font-family: "Press Start 2P", monospace;
+  margin: 14px 0 20px;
+  color: var(--text-onbox);
+  letter-spacing: 6px;
+  font-size: 1rem;
+  text-shadow: 2px 2px 0 var(--border-outer);
 }
 .hero-phrase {
-  font-style: italic;
-  color: var(--text-muted);
-  margin-bottom: 30px;
+  font-size: 1.3rem;
+  color: var(--text-onbox);
+  margin-bottom: 34px;
+  opacity: 0.9;
 }
 .hero-buttons {
   display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: left;
 }
 
-/* ---------------- CARDS / BOTONES ---------------- */
-.card {
-  background: var(--panel);
-  border: 3px solid var(--border-dark);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
-  margin-top: 16px;
-}
-.card-form {
-  max-width: 420px;
-  margin: 40px auto 0;
-}
-.card h2 { margin-top: 0; color: var(--border-dark); }
-.card h3 { color: var(--accent-blue); border-bottom: 2px dashed var(--border-mid); padding-bottom: 6px; }
-
+/* ---------------- BOTONES ESTILO MENÚ ----------------
+   Cada opción es una línea de menú con cursor triangular "▶"
+   que aparece al enfocar/pasar el mouse, como en el juego. */
 .btn {
-  border: 3px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 12px 18px;
-  font-weight: 800;
-  font-size: 1rem;
+  border: 3px solid var(--border-outer);
+  background: var(--panel);
+  color: var(--text-dark);
+  padding: 12px 16px 12px 30px;
+  font-size: 1.15rem;
   cursor: pointer;
-  box-shadow: 3px 3px 0 var(--border-dark);
-  transition: transform 0.05s ease;
+  box-shadow: 4px 4px 0 var(--border-outer);
   min-height: 46px;
+  position: relative;
+  text-align: left;
+  transition: transform 0.05s ease, background 0.1s ease;
 }
-.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--border-dark); }
-.btn-primary { background: var(--accent-red); color: #fff; }
-.btn-secondary { background: var(--accent-blue); color: #fff; }
+.btn::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  opacity: 0;
+}
+.btn:hover, .btn:focus-visible {
+  background: var(--accent-yellow);
+}
+.btn:hover::before, .btn:focus-visible::before {
+  opacity: 1;
+  border-left: 9px solid var(--border-outer);
+}
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--border-outer); }
+
+.btn-primary { background: var(--hp-red); color: var(--text-onbox); }
+.btn-primary:hover, .btn-primary:focus-visible { background: #ff6a52; color: var(--border-outer); }
+.btn-secondary { background: var(--box-blue-top); color: var(--text-onbox); }
+.btn-secondary:hover, .btn-secondary:focus-visible { background: var(--accent-yellow); color: var(--border-outer); }
 .btn-ghost { background: var(--panel-alt); color: var(--text-dark); }
-.btn-outline { background: var(--accent-yellow); color: var(--border-dark); }
-.btn-danger { background: var(--invalid); color: #fff; }
+.btn-outline { background: var(--accent-yellow); color: var(--border-outer); }
+.btn-danger { background: var(--hp-red); color: var(--text-onbox); }
+.btn-danger:hover, .btn-danger:focus-visible { background: #ff6a52; color: var(--border-outer); }
 .btn-block { width: 100%; margin-top: 8px; }
 
 .link-btn {
   background: none;
   border: none;
-  color: var(--accent-blue);
-  font-weight: 700;
+  color: var(--box-blue-top);
+  font-size: 1.05rem;
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
 }
 
-/* ---------------- FORMS ---------------- */
-form { display: flex; flex-direction: column; gap: 12px; }
-label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: 0.9rem; }
-input, select, textarea {
-  border: 2px solid var(--border-mid);
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 1rem;
-  background: var(--panel-alt);
+/* ---------------- CARDS (se convierten en dialog-box) ---------------- */
+.card {
+  background: var(--panel);
+  border: 4px solid var(--border-outer);
+  box-shadow: inset 0 0 0 3px var(--border-inner), 6px 6px 0 var(--border-outer);
+  padding: 22px;
+  margin-top: 18px;
 }
-textarea { width: 100%; resize: vertical; font-family: monospace; }
+.card-form {
+  max-width: 420px;
+  margin: 40px auto 0;
+}
+.card h2 {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  margin-top: 0;
+  color: var(--border-outer);
+  border-bottom: 3px solid var(--box-blue-top);
+  padding-bottom: 10px;
+}
+.card h3 {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.75rem;
+  color: var(--box-blue-bottom);
+  border-bottom: 2px dashed var(--box-blue-top);
+  padding-bottom: 8px;
+  margin-top: 26px;
+}
+
+/* ---------------- FORMS ---------------- */
+form { display: flex; flex-direction: column; gap: 14px; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 1.05rem; color: var(--text-muted); }
+input, select, textarea {
+  border: 2px solid var(--border-outer);
+  background: var(--panel-alt);
+  padding: 10px;
+  color: var(--text-dark);
+}
+input:focus, select:focus, textarea:focus {
+  outline: 3px solid var(--accent-yellow);
+  outline-offset: 1px;
+}
+textarea { width: 100%; resize: vertical; font-family: monospace; font-size: 0.9rem; }
 .form-error {
-  background: #f7b5b5;
-  border: 2px solid var(--invalid);
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 0.9rem;
+  background: #f9d3cf;
+  border: 2px solid var(--hp-red);
+  padding: 10px 12px;
+  font-size: 1rem;
   white-space: pre-line;
 }
-.form-switch { text-align: center; font-size: 0.9rem; }
+.form-switch { text-align: center; font-size: 1rem; }
 
-/* ---------------- DASHBOARD ---------------- */
+/* ---------------- DASHBOARD (HP-box style) ---------------- */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin: 16px 0;
+  margin: 18px 0;
 }
 .stat-box {
   background: var(--panel-alt);
-  border: 2px solid var(--border-mid);
-  border-radius: 8px;
+  border: 2px solid var(--border-outer);
+  box-shadow: 3px 3px 0 var(--box-blue-top);
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-.stat-value { font-size: 1.2rem; font-weight: 800; }
-.dashboard-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-family: "Press Start 2P", monospace; font-size: 0.95rem; color: var(--text-dark); }
+.dashboard-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 .next-match {
-  background: #fff7d6;
+  background: var(--panel-alt);
   border: 2px dashed var(--accent-yellow);
-  border-radius: 8px;
-  padding: 10px;
-  margin: 10px 0;
+  padding: 12px;
+  margin: 12px 0;
 }
+.next-match h3 { margin-top: 0; }
 
 /* ---------------- EQUIPO ---------------- */
-.hint { color: var(--text-muted); font-size: 0.9rem; }
+.hint { color: var(--text-muted); font-size: 1.05rem; }
 .status-banner {
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: 800;
-  margin-bottom: 10px;
+  padding: 14px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  border: 3px solid var(--border-outer);
+  line-height: 1.6;
 }
-.status-banner.pending { background: #fff2c2; border: 2px solid var(--pending); }
-.status-banner.approved { background: #cdf2d6; border: 2px solid var(--approved); }
-.status-banner.invalid { background: #f7c9c9; border: 2px solid var(--invalid); }
+.status-banner.pending { background: #fff2c2; color: #7a5c00; }
+.status-banner.approved { background: #cdf2d6; color: #1c5c2c; }
+.status-banner.invalid { background: #f9d3cf; color: #7a1c14; }
 .reason-box {
   background: #fdeaea;
-  border: 2px solid var(--invalid);
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 12px;
+  border: 2px solid var(--hp-red);
+  padding: 12px;
+  margin-bottom: 14px;
 }
-.team-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.team-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .poke-card {
-  border: 2px solid var(--border-mid);
-  border-radius: 8px;
-  padding: 10px 12px;
+  border: 2px solid var(--box-blue-top);
   background: var(--panel-alt);
+  padding: 10px 12px;
 }
-.poke-card b { color: var(--accent-red); }
-.poke-card .poke-meta { font-size: 0.85rem; color: var(--text-muted); }
-.poke-card ul { margin: 6px 0 0; padding-left: 18px; }
+.poke-card b { font-family: "Press Start 2P", monospace; font-size: 0.85rem; color: var(--hp-red); display: block; margin-bottom: 6px; }
+.poke-card .poke-meta { font-size: 1rem; color: var(--text-muted); }
+.poke-card ul { margin: 8px 0 0; padding-left: 20px; }
 
 /* ---------------- LIGA ---------------- */
-.liga-info { color: var(--text-muted); margin-bottom: 10px; }
-.table-wrap { overflow-x: auto; margin: 10px 0 20px; }
-.league-table { width: 100%; border-collapse: collapse; min-width: 480px; }
+.liga-info { color: var(--text-muted); margin-bottom: 12px; font-size: 1.1rem; }
+.table-wrap { overflow-x: auto; margin: 10px 0 24px; }
+.league-table { width: 100%; border-collapse: collapse; min-width: 480px; font-size: 1.05rem; }
 .league-table th, .league-table td {
-  border: 1px solid var(--border-mid);
+  border: 1px solid var(--box-blue-top);
   padding: 8px 10px;
   text-align: left;
-  font-size: 0.9rem;
 }
-.league-table th { background: var(--border-dark); color: #fff; }
+.league-table th { background: var(--border-outer); color: var(--accent-yellow); font-family: "Press Start 2P", monospace; font-size: 0.65rem; letter-spacing: 1px; }
 .league-table tr:nth-child(even) { background: var(--panel-alt); }
 
 /* ---------------- HOST ---------------- */
-.host-stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
-.host-filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.host-stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.host-filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
 .filter-btn {
-  border: 2px solid var(--border-mid);
+  border: 2px solid var(--border-outer);
   background: var(--panel-alt);
-  border-radius: 6px;
   padding: 8px 14px;
   cursor: pointer;
-  font-weight: 700;
+  font-size: 1rem;
 }
-.filter-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--border-dark); }
+.filter-btn.active { background: var(--box-blue-top); color: var(--text-onbox); }
 .search-input { width: 100%; margin: 10px 0; }
 .host-team-list { display: flex; flex-direction: column; gap: 12px; }
 .host-team-card {
-  border: 2px solid var(--border-mid);
-  border-radius: 8px;
-  padding: 12px;
+  border: 2px solid var(--box-blue-top);
   background: var(--panel-alt);
+  padding: 12px;
 }
 .host-team-card .htc-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
-.badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; color: #fff; }
+.badge { padding: 4px 10px; font-size: 0.75rem; font-family: "Press Start 2P", monospace; color: #fff; }
 .badge.pending { background: #c99a10; }
-.badge.approved { background: var(--approved); }
-.badge.invalid { background: var(--invalid); }
-.htc-pokelist { font-size: 0.85rem; color: var(--text-muted); margin: 6px 0; }
+.badge.approved { background: var(--hp-green); }
+.badge.invalid { background: var(--hp-red); }
+.htc-pokelist { font-size: 1rem; color: var(--text-muted); margin: 6px 0; }
 .htc-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-.htc-actions .btn { padding: 8px 12px; font-size: 0.85rem; min-height: 38px; }
+.htc-actions .btn { padding: 8px 12px 8px 24px; font-size: 0.95rem; min-height: 38px; }
 
 /* ---------------- ADMIN ---------------- */
-.admin-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 20px; }
+.admin-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 22px; }
 .admin-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  border: 1px solid var(--border-mid);
-  border-radius: 6px;
+  border: 1px solid var(--box-blue-top);
   padding: 8px 10px;
   background: var(--panel-alt);
+  font-size: 1.05rem;
 }
 .admin-inline-form {
   display: grid;
@@ -323,7 +435,7 @@ textarea { width: 100%; resize: vertical; font-family: monospace; }
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -332,10 +444,9 @@ textarea { width: 100%; resize: vertical; font-family: monospace; }
 }
 .modal-box {
   background: var(--panel);
-  border: 3px solid var(--border-dark);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
+  border: 4px solid var(--border-outer);
+  box-shadow: inset 0 0 0 3px var(--border-inner), 6px 6px 0 var(--border-outer);
+  padding: 22px;
   max-width: 520px;
   width: 100%;
   max-height: 85vh;
@@ -346,24 +457,24 @@ textarea { width: 100%; resize: vertical; font-family: monospace; }
   position: absolute;
   top: 10px;
   right: 10px;
-  background: var(--invalid);
+  background: var(--hp-red);
   color: #fff;
-  border: 2px solid var(--border-dark);
-  border-radius: 6px;
+  border: 2px solid var(--border-outer);
   width: 34px;
   height: 34px;
   cursor: pointer;
-  font-weight: 800;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.7rem;
 }
 .raw-text {
   background: var(--panel-alt);
-  border: 1px solid var(--border-mid);
-  border-radius: 6px;
+  border: 1px solid var(--box-blue-top);
   padding: 10px;
   white-space: pre-wrap;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   max-height: 200px;
   overflow-y: auto;
+  font-family: monospace;
 }
 
 /* ---------------- RESPONSIVE ---------------- */
@@ -371,9 +482,15 @@ textarea { width: 100%; resize: vertical; font-family: monospace; }
   .dashboard-grid { grid-template-columns: repeat(4, 1fr); }
 }
 @media (max-width: 480px) {
-  .hero-title { font-size: 2.2rem; }
-  .hero { padding: 40px 12px; }
+  .hero-title { font-size: 1.5rem; }
+  .hero-sub { font-size: 0.75rem; }
+  .hero { padding: 36px 12px; }
   .btn { width: 100%; }
-  .hero-buttons { flex-direction: column; }
   .dashboard-buttons .btn { width: 100%; }
+  .card h2 { font-size: 0.8rem; }
+}
+
+/* Respetar preferencia de reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
 }
