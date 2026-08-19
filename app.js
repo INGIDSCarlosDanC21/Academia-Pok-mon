@@ -27,20 +27,90 @@ function showView(id) {
 // es gradual gracias a la transición definida en CSS (body).
 // =========================================================
 const AREA_BACKGROUNDS = {
-  "view-home": "#c7d6a8",
-  "view-register": "#bcd8dd",
-  "view-login": "#bcd8dd",
-  "view-dashboard": "#d7e0b8",
-  "view-register-team": "#d9d2ec",
-  "view-my-team": "#d9d2ec",
-  "view-liga": "#f5dfa8",
-  "view-host": "#e9c3c0",
-  "view-admin": "#c3d2e9"
+  "view-home": { color: "#c7d6a8", hue: "0deg" },
+  "view-register": { color: "#bcd8dd", hue: "150deg" },
+  "view-login": { color: "#bcd8dd", hue: "150deg" },
+  "view-dashboard": { color: "#d7e0b8", hue: "40deg" },
+  "view-register-team": { color: "#d9d2ec", hue: "260deg" },
+  "view-my-team": { color: "#d9d2ec", hue: "260deg" },
+  "view-liga": { color: "#f5dfa8", hue: "60deg" },
+  "view-host": { color: "#e9c3c0", hue: "-20deg" },
+  "view-admin": { color: "#c3d2e9", hue: "200deg" }
 };
 
 function applyAreaBackground(viewId) {
-  const color = AREA_BACKGROUNDS[viewId] || AREA_BACKGROUNDS["view-home"];
-  document.body.style.backgroundColor = color;
+  const area = AREA_BACKGROUNDS[viewId] || AREA_BACKGROUNDS["view-home"];
+  document.body.style.backgroundColor = area.color;
+  document.documentElement.style.setProperty("--pokeball-hue", area.hue);
+}
+
+// =========================================================
+// PARTÍCULAS DE FUEGO (brasas que suben)
+// Generadas dinámicamente con tamaño, velocidad y deriva
+// horizontal aleatorios, para simular un fuego real en vez
+// de llamas estáticas.
+// =========================================================
+function initFireParticles() {
+  const container = document.getElementById("fire-bg");
+  if (!container) return;
+
+  const PARTICLE_COUNT = 45;
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const ember = document.createElement("span");
+    ember.className = "ember";
+
+    const size = 3 + Math.random() * 7;        // 3px a 10px
+    const left = Math.random() * 100;           // 0% a 100%
+    const duration = 3 + Math.random() * 4;      // 3s a 7s
+    const delay = Math.random() * 7;             // 0s a 7s
+    const drift = (Math.random() * 60 - 30).toFixed(0); // -30px a 30px
+
+    ember.style.width = size + "px";
+    ember.style.height = size + "px";
+    ember.style.left = left + "%";
+    ember.style.animationDuration = duration + "s";
+    ember.style.animationDelay = delay + "s";
+    ember.style.setProperty("--drift", drift + "px");
+
+    container.appendChild(ember);
+  }
+}
+initFireParticles();
+
+// =========================================================
+// MÚSICA DE FONDO (en bucle, volumen bajo)
+// =========================================================
+const bgMusic = document.getElementById("bg-music");
+const muteBtn = document.getElementById("btn-mute-music");
+let musicStarted = false;
+let musicMuted = false;
+
+if (bgMusic) bgMusic.volume = 0.12;
+
+function startMusicOnFirstInteraction() {
+  if (musicStarted || !bgMusic || musicMuted) return;
+  bgMusic.play().then(() => {
+    musicStarted = true;
+  }).catch(() => {
+    // El navegador bloqueó el autoplay; se reintentará en la próxima interacción.
+  });
+}
+
+document.addEventListener("click", startMusicOnFirstInteraction, { once: false });
+document.addEventListener("keydown", startMusicOnFirstInteraction, { once: false });
+
+if (muteBtn) {
+  muteBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    musicMuted = !musicMuted;
+    if (musicMuted) {
+      bgMusic.pause();
+      muteBtn.textContent = "🔇";
+    } else {
+      muteBtn.textContent = "🔊";
+      bgMusic.play().then(() => { musicStarted = true; }).catch(() => {});
+    }
+  });
 }
 
 // =========================================================
