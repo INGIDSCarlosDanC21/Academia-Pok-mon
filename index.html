@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Copa 151 UABCS</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="brand" id="btn-go-home">COPA 151 · UABCS</button>
+    <nav class="topnav">
+      <button id="nav-liga" class="nav-link">Liga</button>
+      <span id="nav-user-area" class="nav-user-area"></span>
+    </nav>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- ================= MENSAJES GLOBALES ================= -->
+  <div id="global-message" class="global-message hidden"></div>
+
+  <!-- ================= 1. INICIO ================= -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <h1 class="hero-title">COPA 151</h1>
+      <h2 class="hero-sub">UABCS</h2>
+      <p class="hero-phrase">"151 Pokémon. 4 en combate. 1 campeón."</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary" id="btn-home-login">Iniciar sesión</button>
+        <button class="btn btn-secondary" id="btn-home-register">Crear cuenta</button>
+        <button class="btn btn-ghost" id="btn-home-liga">Ver liga</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2. REGISTRO ================= -->
+  <section id="view-register" class="view hidden">
+    <div class="card card-form">
+      <h2>Crear cuenta</h2>
+      <form id="form-register">
+        <label>Usuario
+          <input type="text" id="reg-username" required minlength="3" maxlength="24" />
+        </label>
+        <label>Correo electrónico
+          <input type="email" id="reg-email" required />
+        </label>
+        <label>Contraseña
+          <input type="password" id="reg-password" required minlength="6" />
+        </label>
+        <div id="register-error" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+      </form>
+      <p class="form-switch">¿Ya tienes cuenta?
+        <button class="link-btn" id="link-to-login">Inicia sesión</button>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 3. LOGIN ================= -->
+  <section id="view-login" class="view hidden">
+    <div class="card card-form">
+      <h2>Iniciar sesión</h2>
+      <form id="form-login">
+        <label>Correo
+          <input type="email" id="login-email" required />
+        </label>
+        <label>Contraseña
+          <input type="password" id="login-password" required />
+        </label>
+        <div id="login-error" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>
+      </form>
+      <p class="form-switch">¿No tienes cuenta?
+        <button class="link-btn" id="link-to-register">Regístrate</button>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 4. PANEL DEL JUGADOR ================= -->
+  <section id="view-dashboard" class="view hidden">
+    <div class="card">
+      <h2>Panel del jugador</h2>
+      <div class="dashboard-grid">
+        <div class="stat-box">
+          <span class="stat-label">Usuario</span>
+          <span class="stat-value" id="dash-username">-</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Puntos de Academia</span>
+          <span class="stat-value" id="dash-points">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Estado de inscripción</span>
+          <span class="stat-value" id="dash-inscripcion">-</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Estado del equipo</span>
+          <span class="stat-value" id="dash-team-status">-</span>
+        </div>
+      </div>
+      <div id="dash-next-match" class="next-match hidden">
+        <h3>Próximo combate</h3>
+        <p id="dash-next-match-text"></p>
+      </div>
+      <div class="dashboard-buttons">
+        <button class="btn btn-primary" id="btn-goto-register-team">Registrar equipo</button>
+        <button class="btn btn-secondary" id="btn-goto-my-team">Ver mi equipo</button>
+        <button class="btn btn-ghost" id="btn-goto-liga-from-dash">Ver liga</button>
+        <button class="btn btn-outline" id="btn-goto-host" style="display:none">Panel de Host</button>
+        <button class="btn btn-outline" id="btn-goto-admin" style="display:none">Panel de Administrador</button>
+        <button class="btn btn-danger" id="btn-logout">Cerrar sesión</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. REGISTRAR EQUIPO ================= -->
+  <section id="view-register-team" class="view hidden">
+    <div class="card">
+      <h2>Registrar equipo</h2>
+      <p class="hint">Pega abajo el texto exportado desde Pokémon Showdown (4 Pokémon).</p>
+      <textarea id="team-raw-input" rows="14" placeholder="Pikachu @ Light Ball
+Ability: Static
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Protect
+- Grass Knot
+- Volt Switch
+
+Charizard @ ..."></textarea>
+      <div id="team-errors" class="form-error hidden"></div>
+      <div class="dashboard-buttons">
+        <button class="btn btn-primary" id="btn-submit-team">Registrar equipo</button>
+        <button class="btn btn-ghost" id="btn-cancel-team">Volver al panel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 6. VER MI EQUIPO ================= -->
+  <section id="view-my-team" class="view hidden">
+    <div class="card">
+      <h2>Mi equipo</h2>
+      <div id="my-team-status-banner" class="status-banner"></div>
+      <div id="my-team-reason" class="reason-box hidden">
+        <strong>Motivo:</strong>
+        <p id="my-team-reason-text"></p>
+      </div>
+      <div id="my-team-list" class="team-list"></div>
+      <div class="dashboard-buttons">
+        <button class="btn btn-primary" id="btn-fix-team">Corregir equipo</button>
+        <button class="btn btn-ghost" id="btn-back-from-my-team">Volver al panel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 12. LIGA (pública) ================= -->
+  <section id="view-liga" class="view hidden">
+    <div class="card">
+      <h2 id="liga-tournament-name">Copa 151 UABCS</h2>
+      <div class="liga-info">
+        <span id="liga-date"></span> · <span id="liga-time"></span> · <span id="liga-location"></span>
+      </div>
+      <p id="liga-next-match" class="hint hidden"></p>
+
+      <h3>Tabla de clasificación</h3>
+      <div class="table-wrap">
+        <table class="league-table">
+          <thead>
+            <tr><th>Pos.</th><th>Jugador</th><th>Puntos de Academia</th><th>Victorias</th><th>Derrotas</th></tr>
+          </thead>
+          <tbody id="liga-table-body"></tbody>
+        </table>
+      </div>
+
+      <h3>Próximos combates</h3>
+      <div class="table-wrap">
+        <table class="league-table">
+          <thead>
+            <tr><th>Jugador 1</th><th>Jugador 2</th><th>Ronda</th><th>Fecha</th><th>Hora</th><th>Estado</th><th>Ganador</th></tr>
+          </thead>
+          <tbody id="liga-matches-body"></tbody>
+        </table>
+      </div>
+      <div class="dashboard-buttons">
+        <button class="btn btn-ghost" id="btn-liga-back">Volver</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 8. PANEL DE HOST ================= -->
+  <section id="view-host" class="view hidden">
+    <div class="card">
+      <h2>Panel de Host</h2>
+      <div class="host-stats">
+        <div class="stat-box"><span class="stat-label">Pendientes</span><span class="stat-value" id="host-count-pending">0</span></div>
+        <div class="stat-box"><span class="stat-label">Aprobados</span><span class="stat-value" id="host-count-approved">0</span></div>
+        <div class="stat-box"><span class="stat-label">Inválidos</span><span class="stat-value" id="host-count-invalid">0</span></div>
+      </div>
+      <div class="host-filters">
+        <button class="filter-btn active" data-filter="all">TODOS</button>
+        <button class="filter-btn" data-filter="pending">PENDIENTES</button>
+        <button class="filter-btn" data-filter="approved">APROBADOS</button>
+        <button class="filter-btn" data-filter="invalid">INVÁLIDOS</button>
+      </div>
+      <input type="text" id="host-search" placeholder="Buscar jugador..." class="search-input" />
+      <div id="host-team-list" class="host-team-list"></div>
+      <div class="dashboard-buttons">
+        <button class="btn btn-ghost" id="btn-host-back">Volver al panel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 17. PANEL DE ADMINISTRADOR ================= -->
+  <section id="view-admin" class="view hidden">
+    <div class="card">
+      <h2>Panel de Administrador</h2>
+
+      <h3>Usuarios y roles</h3>
+      <input type="text" id="admin-user-search" placeholder="Buscar usuario..." class="search-input" />
+      <div id="admin-user-list" class="admin-list"></div>
+
+      <h3>Torneos</h3>
+      <form id="form-new-tournament" class="admin-inline-form">
+        <input type="text" id="tourn-name" placeholder="Nombre del torneo" required />
+        <input type="date" id="tourn-date" required />
+        <input type="time" id="tourn-time" required />
+        <input type="text" id="tourn-location" placeholder="Lugar" required />
+        <input type="text" id="tourn-format" placeholder="Formato" value="Dobles 4 vs 4" required />
+        <button type="submit" class="btn btn-primary">Crear torneo</button>
+      </form>
+      <div id="admin-tournament-list" class="admin-list"></div>
+
+      <h3>Combates</h3>
+      <form id="form-new-match" class="admin-inline-form">
+        <select id="match-tournament"></select>
+        <select id="match-player1"></select>
+        <select id="match-player2"></select>
+        <input type="number" id="match-round" placeholder="Ronda" min="1" value="1" required />
+        <input type="date" id="match-date" />
+        <input type="time" id="match-time" />
+        <button type="submit" class="btn btn-primary">Crear combate</button>
+      </form>
+      <div id="admin-match-list" class="admin-list"></div>
+
+      <h3>Revisión de equipos</h3>
+      <p class="hint">El administrador tiene las mismas herramientas que el Host.</p>
+      <button class="btn btn-outline" id="btn-admin-goto-host">Abrir panel de Host</button>
+
+      <div class="dashboard-buttons">
+        <button class="btn btn-ghost" id="btn-admin-back">Volver al panel</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Modal: detalle completo de equipo (Host/Admin) -->
+<div id="modal-team-detail" class="modal hidden">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close-btn">✕</button>
+    <h3>Equipo completo</h3>
+    <pre id="modal-raw-text" class="raw-text"></pre>
+    <div id="modal-team-list" class="team-list"></div>
+  </div>
+</div>
+
+<!-- Modal: motivo de invalidación -->
+<div id="modal-invalid-reason" class="modal hidden">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-reason-close-btn">✕</button>
+    <h3>Marcar equipo como inválido</h3>
+    <p>Indica el motivo por el que el equipo es inválido.</p>
+    <textarea id="invalid-reason-text" rows="4"></textarea>
+    <div id="invalid-reason-error" class="form-error hidden"></div>
+    <button class="btn btn-danger btn-block" id="btn-confirm-invalid">Confirmar</button>
+  </div>
+</div>
+
+<!-- Modal: cambiar rol de usuario (Admin) -->
+<div id="modal-user-role" class="modal hidden">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-role-close-btn">✕</button>
+    <h3>Editar usuario</h3>
+    <p id="modal-role-username"></p>
+    <label>Rol
+      <select id="modal-role-select">
+        <option value="player">player</option>
+        <option value="host">host</option>
+        <option value="admin">admin</option>
+      </select>
+    </label>
+    <label>Ajustar Puntos de Academia (+/-)
+      <input type="number" id="modal-points-adjust" value="0" />
+    </label>
+    <button class="btn btn-primary btn-block" id="btn-save-user-role">Guardar</button>
+  </div>
+</div>
+
+<!-- Modal: registrar ganador de combate (Admin) -->
+<div id="modal-match-winner" class="modal hidden">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-winner-close-btn">✕</button>
+    <h3>Registrar ganador</h3>
+    <select id="modal-winner-select"></select>
+    <button class="btn btn-primary btn-block" id="btn-save-match-winner">Guardar resultado</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="parser.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
