@@ -10,12 +10,15 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
 <div class="pokeball-bg" aria-hidden="true"></div>
+<div class="fire-bg" id="fire-bg" aria-hidden="true"></div>
 
 <header class="topbar">
   <div class="topbar-inner">
     <button class="brand" id="btn-go-home">COPA 151 · UABCS</button>
     <nav class="topnav">
+      <button id="btn-mute-music" class="nav-link" title="Silenciar/activar música" type="button">🔊</button>
       <button id="nav-liga" class="nav-link">Liga</button>
       <span id="nav-user-area" class="nav-user-area"></span>
     </nav>
