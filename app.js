@@ -18,7 +18,66 @@ function showView(id) {
   const el = document.getElementById(id);
   if (el) el.classList.remove("hidden");
   window.scrollTo(0, 0);
+  applyAreaBackground(id);
 }
+
+// =========================================================
+// FONDO DINÁMICO POR ÁREA
+// Cada vista tiene un tono de fondo propio; el cambio de color
+// es gradual gracias a la transición definida en CSS (body).
+// =========================================================
+const AREA_BACKGROUNDS = {
+  "view-home": "#c7d6a8",
+  "view-register": "#bcd8dd",
+  "view-login": "#bcd8dd",
+  "view-dashboard": "#d7e0b8",
+  "view-register-team": "#d9d2ec",
+  "view-my-team": "#d9d2ec",
+  "view-liga": "#f5dfa8",
+  "view-host": "#e9c3c0",
+  "view-admin": "#c3d2e9"
+};
+
+function applyAreaBackground(viewId) {
+  const color = AREA_BACKGROUNDS[viewId] || AREA_BACKGROUNDS["view-home"];
+  document.body.style.backgroundColor = color;
+}
+
+// =========================================================
+// EFECTO DE SONIDO ESTILO VIDEOJUEGO ("blip" de menú)
+// Generado con Web Audio API — sin archivos de audio con
+// copyright. Suena al presionar botones y enlaces del menú.
+// =========================================================
+let sfxContext = null;
+function playMenuBlip() {
+  try {
+    if (!sfxContext) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      sfxContext = new AudioCtx();
+    }
+    if (sfxContext.state === "suspended") sfxContext.resume();
+
+    const osc = sfxContext.createOscillator();
+    const gain = sfxContext.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(880, sfxContext.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1320, sfxContext.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.12, sfxContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, sfxContext.currentTime + 0.09);
+    osc.connect(gain);
+    gain.connect(sfxContext.destination);
+    osc.start();
+    osc.stop(sfxContext.currentTime + 0.1);
+  } catch (e) {
+    // Si el navegador bloquea audio, simplemente no suena; no afecta la app.
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("button, .btn, .nav-link, .filter-btn, .link-btn");
+  if (el) playMenuBlip();
+}, true);
 
 function showGlobalMessage(text, type) {
   const box = document.getElementById("global-message");
